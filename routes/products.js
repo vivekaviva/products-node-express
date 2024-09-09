@@ -158,6 +158,7 @@ router.get("/api/query", (req, res) => {
 router.post("/api/products", (req, res) => {
   const { id, name, image, price, desc, reviews } = req.body;
 
+  //validation
   if (!id || !name || !image || !price || !desc) {
     return res.status(500).json({ error: "Please provide all the datas" });
   }
@@ -166,6 +167,55 @@ router.post("/api/products", (req, res) => {
   products.push(newProduct);
 
   res.status(200).json({ sucess: true, data: newProduct });
+});
+
+/**
+ * Update the product details
+ */
+router.put("/api/products/:productID", (req, res) => {
+  const { productID } = req.params;
+  const { id, name, image, price, desc, reviews } = req.body;
+
+  console.log("productID", productID);
+  const product = products.find((p) => p.id === Number(productID));
+  console.log("product", product);
+
+  if (!product) {
+    return res.status(404).json({ Error: "Product Not Found" });
+  }
+
+  if (id) {
+    return res.status(500).json({ Error: "Id is unique element" });
+  }
+
+  // Update the product's properties only if they are provided in the request body
+  if (name) product.name = name;
+  if (image) product.image = image;
+  if (price) product.price = price;
+  if (desc) product.desc = desc;
+  if (reviews) product.reviews = reviews;
+
+  res.status(200).json({ success: true, data: product });
+});
+
+/**
+ * Delete the product
+ */
+router.delete("/api/products/:productID", (req, res) => {
+  const { productID } = req.params;
+
+  const product = products.findIndex(
+    (product) => product.id === Number(productID)
+  );
+
+  if (product === -1) {
+    return res.status(404).json({ error: "product not found" });
+  }
+
+  const deletedProduct = products.splice(product, 1);
+
+  // res.status(200).json(deletedProduct[0]);
+  res.status(200).json(products);
 });
 
 module.exports = router;
