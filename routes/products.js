@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 
 const { products } = require("../data");
+const common = require("../helpers/common");
 
 //All Products
 router.get("/api/products", (req, res, next) => {
@@ -12,7 +13,11 @@ router.get("/api/products", (req, res, next) => {
     return { id, name, image, price };
   });
 
-  res.status(200).json({ sucess: true, status: 200, data: newProducts });
+  // const message = newProducts ? "Success! " : " No Products Found";
+
+  return common.sendResponse(newProducts, req, res);
+
+  // res.status(200).json({ sucess: true, status: 200, data: newProducts });
   //res.send(newProducts);
 });
 
@@ -28,13 +33,18 @@ router.get("/api/products/:productID", (req, res) => {
   );
 
   if (!singleProduct) {
-    return res.status(404).send("Product Does not exist");
+    const message = "Product does not exist";
+
+    return common.sendError(message, singleProduct, res);
+
+    // return res.status(404).send("Product Does not exist");
   }
 
   // const { id, name, image, price } = singleProduct;
   // return res.json({ id, name, image, price });
 
-  return res.json({ sucess: true, status: 200, data: singleProduct });
+  return common.sendResponse(singleProduct, req, res);
+  // return res.json({ sucess: true, status: 200, data: singleProduct });
 });
 
 //Review with id
@@ -45,7 +55,9 @@ router.get("/api/products/:productID/reviews/:reviewID", (req, res) => {
   const product = products.find((product) => product.id === Number(productID));
 
   if (!product) {
-    return res.status(404).send("Product Does not exist");
+    const message = "Product does not exist";
+    return common.sendError(message, product, res);
+    // return res.status(404).send("Product Does not exist");
   }
 
   const review = product.reviews.find(
@@ -56,7 +68,8 @@ router.get("/api/products/:productID/reviews/:reviewID", (req, res) => {
     return res.status(404).send("Review Does not exist");
   }
 
-  return res.json({ sucess: true, status: 200, data: review });
+  return common.sendResponse(review, req, res);
+  // return res.json({ sucess: true, status: 200, data: review });
 });
 
 //Review
